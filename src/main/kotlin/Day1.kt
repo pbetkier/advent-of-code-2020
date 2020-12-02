@@ -10,7 +10,7 @@ private fun day1(input: List<Int>, size: Int) = Sets.combinations(input.toSet(),
             .firstOrNull { it.sum() == 2020 }
             ?.reduce { a, x -> a * x } ?: -1
 
-fun main(args: Array<String>) {
+fun main() {
     println(day1a(loadInts("day1")))
     println(day1b(loadInts("day1")))
 }
