@@ -23,44 +23,23 @@ fun day13a(inputFile: String): Int {
 
 fun day13b(inputFile: String): Long {
     val busOffsets = loadDay13b(inputFile)
-    println(busOffsets)
 
-    // find max bus
-    // sorted map descending (bus, offset) without max bus
-    // long ts = max bus - bus.offset
-    // while (true)
-    //   found = true
-    //   sorted map.each
-    //     (ts + offset) % bus != 0 { found=false; break }
-    //   if found
-    //     return ts
-    //   ts += max bus
-
-    val maxBus = busOffsets.keys.max()!!
-    val busOffsetsSorted = busOffsets.toSortedMap(reverseOrder())
-    busOffsetsSorted.remove(maxBus)
-
-    var ts = (maxBus - busOffsets[maxBus]!!).toLong()
-    while (true) {
-        var found = true
-        busOffsetsSorted.forEach { bus, offset ->
-            if ((ts + offset) % bus != 0L) {
-                found = false
-                return@forEach
+    var agg = busOffsets[0].first.toLong()
+    var plus = 0L
+    for (b in 1 until busOffsets.size) {
+        for (i in 0 until busOffsets[b].first) {
+            if ((agg * i + plus + busOffsets[b].second) % busOffsets[b].first == 0L) {
+                if (b == busOffsets.size - 1) {
+                    return agg * i + plus
+                }
+                plus += agg * i
+                agg *= busOffsets[b].first
+                break
             }
         }
-        if (found) {
-            return ts
-        }
-        ts += maxBus
-
-        if (ts % 100000000 == 0L) {
-            println(ts / 100000000000000.toDouble())
-        }
     }
+    return -1
 }
-
-// gcd b1, b2 gdzie szukamy nie do 0 a do offsetu?
 
 private fun loadDay13(inputFile: String): Input13 {
     val lines = Resources.readLines(Resources.getResource(inputFile), Charsets.UTF_8)
@@ -70,12 +49,12 @@ private fun loadDay13(inputFile: String): Input13 {
     )
 }
 
-private fun loadDay13b(inputFile: String): Map<Int, Int> {
+private fun loadDay13b(inputFile: String): List<Pair<Int, Int>> {
     val lines = Resources.readLines(Resources.getResource(inputFile), Charsets.UTF_8)
-    val busOffset = mutableMapOf<Int, Int>()
+    val busOffset = mutableListOf<Pair<Int, Int>>()
     lines[1].split(',').forEachIndexed { i, b ->
         if (b != "x") {
-            busOffset[b.toInt()] = i
+            busOffset.add(Pair(b.toInt(), i))
         }
     }
     return busOffset
